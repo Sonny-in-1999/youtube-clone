@@ -32,7 +32,7 @@ const handleProtected = (req, res) => {
 
 app.use(logger); //middleware 사용, 반드시 get보다 위에 있어야함
 app.use(privateMiddleware); //use를 사용함으로써 모든 url에 middleware를 적용함.
-app.get("/", handleHome);   // "/" = router 문 같은 역할
+app.get("/", handleHome);   // "/" = router(path) 문 같은 역할
 app.get("/login", handleLogin); 
 app.get("/protected", handleProtected);
 //app.get(path, middleware, finalware)의 형식으로 하나의 url에만 middleware를 적용할 수 있음
