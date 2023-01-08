@@ -8,8 +8,12 @@ const PORT = 4000;
 
 const app = express();
 const logger = morgan("dev"); //return middleware
-app.use(logger);
 
+app.set("view engine","pug"); //view engine을 pug 플러그인으로 set.
+app.set("views", process.cwd() + "/src/views");
+ /* 퍼그는 기본적으로 노드를 실행하는 json의 경로에서 views 폴더를 탐색하여 렌더링 하기 때문에
+ 현재 작업중인 디렉토리(경로)를 임의로 변경 하였음 */
+app.use(logger);
 app.use("/", globalRouter);
 app.use("/users", userRouter);
 app.use("/videos", videoRouter);
@@ -19,3 +23,4 @@ app.use("/videos", videoRouter);
 const handleListening = () => console.log(`Server listening on http://localhost:${PORT}`);
 
 app.listen(PORT, handleListening); //server 시작시 출력
+
