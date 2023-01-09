@@ -1,4 +1,7 @@
 extends base.pug
 
 block content
-    h1 Watch Video!
+    h3 #{video.views} #{video.views == 1 ? "view" : "views"}
+    //조회수가 1일경우 view 출력(이외에는 views 출력)
+    a(href=`${video.id}/edit`) Edit Video &rarr;
+    // /~~: 경로에 상관없이 root주소/~~로 이동함
