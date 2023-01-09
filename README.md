@@ -17,3 +17,15 @@ Router
 /videos/:id/edit -> Edit video
 /videos/:id/delete -> Delete video
 /videos/upload -> Upload video
+
+
+#Template
+1. Conditinal
+ex)login/log-out
+if/else/else if
+
+2. iteration
+showing lists of element
+each ~~ in ~~
+
+3. mixing
