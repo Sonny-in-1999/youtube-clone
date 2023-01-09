@@ -16,7 +16,8 @@ app.set("views", process.cwd() + "/src/views");
 app.use(logger); 
 //사용할 middleware는 반드시 logger(morgan plugin)밑에 작성할것!
 app.use(express.urlencoded({extended:true}));
-//form의 value를 리턴해주는 middleware
+//form의 value를 리턴해주는 middleware ==> form을 javascript로 변환해줌
+//이 구간에서 req.body 생성
 app.use("/", globalRouter);
 app.use("/users", userRouter);
 app.use("/videos", videoRouter);
