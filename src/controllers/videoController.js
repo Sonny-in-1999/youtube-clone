@@ -6,7 +6,7 @@ videoModel.find({}, (error, videos) => {
 });
 //{}: Search Term(비어있을 경우, 모든 형식을 search), db가 반응할경우 mongoose가 function 실행!
 
-export const home = async(req, res) => {
+export const home = async(req, res) => { //promise 형식으로 작성되었음 (Not callback)
     try { //에러가 발생하지 않을경우 그대로 실행
         const videos = await videoModel.find({});
         //await: callback이 필요하지 않음을 의미(표시)! await이 db를 기다려줌 (중요)await은 async function 안에서만 사용가능!!
