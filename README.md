@@ -29,3 +29,9 @@ showing lists of element
 each ~~ in ~~
 
 3. mixing
+
+#CRUD
+Create
+Read
+Update
+Delete
