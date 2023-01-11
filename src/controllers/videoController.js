@@ -12,7 +12,7 @@ export const home = async(req, res) => { //promise 형식으로 작성되었음 
         //await: callback이 필요하지 않음을 의미(표시)! await이 db를 기다려줌 (중요)await은 async function 안에서만 사용가능!!
         res.render("home", {pageTitle: "Home", videos: []});
         //template를 rendering
-        //return이 아닌 function 그 자체에 집중할 것!
+        //return이 아닌 function(render) 그 자체에 집중할 것!
     } catch{ //에러가 발생할 경우 실행
         return res.render("server-error");
     }
