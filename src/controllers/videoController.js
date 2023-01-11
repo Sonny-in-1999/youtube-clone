@@ -1,9 +1,7 @@
 
 import videoModel from "../models/video"
 
-videoModel.find({}, (error, videos) => {
-
-});
+videoModel.find({}, (error, videos) => {});
 //{}: Search Term(비어있을 경우, 모든 형식을 search), db가 반응할경우 mongoose가 function 실행!
 
 export const home = async(req, res) => { //promise 형식으로 작성되었음 (Not callback)
@@ -22,20 +20,38 @@ export const home = async(req, res) => { //promise 형식으로 작성되었음 
     }
 };
 
-export const watch = (req, res) => {
+export const watch = async (req, res) => {
     const { id } = req.params;
-    res.render("watch", {pageTitle:`Watching: ${video.title}`});
+    const video = await videoModel.findById(id);
+    if(!video){
+        return res.render("404", {pageTitle: "Video not found."});
+        //존재하지 않는 영상(존재하지 않는 id)을 검색한 경우
+    };
+    res.render("watch", {pageTitle: video.title, video });
 };
 
-export const getEdit = (req, res) => {
+export const getEdit = async (req, res) => {
     const { id } = req.params;
-    res.render("edit", {pageTitle:`Editing: ${video.title}`});
+    const video = await videoModel.findById(id);
+    if(!video){
+        return res.render("404", {pageTitle: "Video not found."});
+        //존재하지 않는 영상(존재하지 않는 id)을 검색한 경우
+    };
+    res.render("edit", {pageTitle:`Edit ${video.title}`, video});
 };
 
-export const postEdit = (req, res) => {
+export const postEdit = async (req, res) => {
     const { id } = req.params;
-    const { title } = req.body;
-    //form에 작성한 내용으로 title을 변경
+    const {title, description, hashtags} = req.body;
+    const video = await videoModel.exists({ _id: id });
+    //exists() => ()안의 내용이 존재하는지 찾을 수 있음
+    if(!video){
+        return res.render("404", {pageTitle: "Video not found."});
+        //존재하지 않는 영상(존재하지 않는 id)을 검색한 경우
+    };
+    await videoModel.findByIdAndUpdate(id, {
+        title, description, hashtags: hashtags.split(",").map((word) => word.startsWith('#') ? word : `#${word}`)
+    })
     return res.redirect(`/videos/${id}`);
 };
 
@@ -46,17 +62,23 @@ export const getUpload = (req, res) => {
 export const postUpload = async (req, res) => {
     const { title, description, hashtags } = req.body;
     //name="title"인 input(upload.pug의 text)에서 req.body(input의 내용)을 받아옴!
-    await videoModel.create({
-        title,
-        description,
-        hashtags: hashtags.split(",").map((word) => `#${word}`),
-        meta: {
-            views: {type:Number, default: 0, required: true},
-            rating: {type:Number, default: 0, required: true},
-        },
-    });
-    //await video.save();
-    //video.save() => 생성된 video를 return 해줌 (db에 저장!)
-    return res.redirect("/");
+    try {
+        await videoModel.create({
+            title,
+            description,
+            hashtags: hashtags
+            .split(",").map((word) => `#${word}`)
+            .map((word) => (word.startWith("#") ? word : `#${word}`)),
+        });
+        //await video.save();
+        //video.save() => 생성된 video를 return 해줌 (db에 저장!)
+        return res.redirect("/");
+    } catch (error) {
+        return res.render("upload", {
+            pageTitle: "Upload Video",
+            errorMessage: error._message,
+        });
+    }
+    
 };
 

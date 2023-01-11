@@ -1,4 +1,4 @@
-<!--inherit file(상속파일)-->
+//inherit file(상속파일)
 
 doctype html
 html(lang="ko")
@@ -10,7 +10,10 @@ html(lang="ko")
             h1=pageTitle
             nav
                 ul
-                    a(href="/videos/upload") Upload Video
+                    li
+                        a(href="/videos/upload") Upload Video
+                    li
+                        a(href="/") Home
         main
             block content
     include partials/footer
