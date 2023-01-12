@@ -1,7 +1,8 @@
 
 import mongoose from "mongoose";
 
-const videoSchema = new mongoose.Schema({
+const videoSchema = new mongoose.Schema({ //video(model)의 형식(schema)지정
+    //use validation => 데이터의 형식을 사전에 지정(문서화!)
     title: { type: String, required: true, maxLength: 80 },
     description: { type: String, required: true, minLength: 20 },
     createdAt: { type:Date, required: true, default: Date.now },
@@ -15,7 +16,11 @@ const videoSchema = new mongoose.Schema({
         rating: {type:Number, default: 0, required: true},
     },
 });
-//video(model)의 형식(schema)지정
+videoSchema.static('formatHashtags', function(hashtags){
+    return hashtags.split(",").map((word) => word.startsWith('#') ? word : `#${word}`);
+});
+//static(정적 메소드)을 사용하면 import 없이 Model.function() 형태로 사용이 가능함
+
 
 const videoModel = mongoose.model("Video", videoSchema);
 //video model 지정

@@ -3,10 +3,12 @@ import videoModel from "../models/video"
 
 videoModel.find({}, (error, videos) => {});
 //{}: Search Term(비어있을 경우, 모든 형식을 search), db가 반응할경우 mongoose가 function 실행!
+//promise 형식으로 작성(async - await)
 
-export const home = async(req, res) => { //promise 형식으로 작성되었음 (Not callback)
+export const home = async(req, res) => { 
     try { //실행
-        const videos = await videoModel.find({});
+        const videos = await videoModel.find({}).sort({createdAt:"desc"});
+        //sort: ~~를 기준으로 영상을 분류
         //videoModel.find({}) => db에 있는 video를 불러옴
         //await: callback이 필요하지 않음을 의미(표시)! await이 db를 기다려줌 (중요)await은 async function 안에서만 사용가능!!
         console.log(videos);
@@ -21,7 +23,7 @@ export const home = async(req, res) => { //promise 형식으로 작성되었음 
 };
 
 export const watch = async (req, res) => {
-    const { id } = req.params;
+    const { id } = req.params; //영상의 링크마다 존재하는 난수(id)를 id로 지정. id를 통해 영상을 구분!!
     const video = await videoModel.findById(id);
     if(!video){
         return res.render("404", {pageTitle: "Video not found."});
@@ -31,7 +33,7 @@ export const watch = async (req, res) => {
 };
 
 export const getEdit = async (req, res) => {
-    const { id } = req.params;
+    const { id } = req.params; //영상의 링크마다 존재하는 난수(id)를 id로 지정. id를 통해 영상을 구분!!
     const video = await videoModel.findById(id);
     if(!video){
         return res.render("404", {pageTitle: "Video not found."});
@@ -41,8 +43,8 @@ export const getEdit = async (req, res) => {
 };
 
 export const postEdit = async (req, res) => {
-    const { id } = req.params;
-    const {title, description, hashtags} = req.body;
+    const { id } = req.params; //영상의 링크마다 존재하는 난수(id)를 id로 지정. id를 통해 영상을 구분!!
+    const {title, description, hashtags} = req.body; //form의 내용을 받아옴!
     const video = await videoModel.exists({ _id: id });
     //exists() => ()안의 내용이 존재하는지 찾을 수 있음
     if(!video){
@@ -50,7 +52,9 @@ export const postEdit = async (req, res) => {
         //존재하지 않는 영상(존재하지 않는 id)을 검색한 경우
     };
     await videoModel.findByIdAndUpdate(id, {
-        title, description, hashtags: hashtags.split(",").map((word) => word.startsWith('#') ? word : `#${word}`)
+        title, 
+        description, 
+        hashtags: videoModel.formatHashtags(hashtags),
     })
     return res.redirect(`/videos/${id}`);
 };
@@ -60,15 +64,13 @@ export const getUpload = (req, res) => {
 };
 
 export const postUpload = async (req, res) => {
-    const { title, description, hashtags } = req.body;
+    const { title, description, hashtags } = req.body; //form의 내용을 받아옴!
     //name="title"인 input(upload.pug의 text)에서 req.body(input의 내용)을 받아옴!
     try {
         await videoModel.create({
             title,
             description,
-            hashtags: hashtags
-            .split(",").map((word) => `#${word}`)
-            .map((word) => (word.startWith("#") ? word : `#${word}`)),
+            hashtags: videoModel.formatHashtags(hashtags),
         });
         //await video.save();
         //video.save() => 생성된 video를 return 해줌 (db에 저장!)
@@ -82,3 +84,24 @@ export const postUpload = async (req, res) => {
     
 };
 
+export const deleteVideo = async (req, res) => {
+    const {id} = req.params; //영상의 링크마다 존재하는 난수(id)를 id로 지정. id를 통해 영상을 구분!!
+    await videoModel.findByIdAndDelete(id);
+    //delete video
+    //몽고DB는 롤백기능을 지원하지 않으므로 대부분의 상황에서 Remove가 아닌 Delete를 사용!
+    return res.redirect("/");
+};
+
+export const search = async (req, res) => {
+    const {keyword} = req.query;
+    let videos = [];
+    if(keyword){ //keyword(검색한 내용)가 있을경우 title이 keyword와 일치한 video를 search
+        videos = await videoModel.find({
+            title: { //$regex : keyword를 포함(contains)하여 검색!
+                $regex: new RegExp(keyword, "i") //"i": 대/소문자 구분없이 검색
+            },
+        });
+    }
+    console.log(videos);
+    return res.render("search", {pageTitle:"Search", videos});
+}

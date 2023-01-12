@@ -1,5 +1,12 @@
 import express from "express";
-import { getEdit, postEdit, upload, deleteVideo, watch, getUpload, postUpload } from "../controllers/videoController";
+import { 
+    getEdit, 
+    postEdit,   
+    watch, 
+    getUpload, 
+    postUpload,
+    deleteVideo,
+} from "../controllers/videoController";
 
 
 const videoRouter = express.Router();
@@ -10,6 +17,7 @@ const videoRouter = express.Router();
 // (\\w+): 1개이상(+)의 글자(world)만 parameter로 사용가능.
 videoRouter.get("/:id([0-9a-f]{24})", watch);
 videoRouter.route("/:id([0-9a-f]{24})/edit").get(getEdit).post(postEdit);
+videoRouter.route("/:id([0-9a-f]{24})/delete").get(deleteVideo);
 videoRouter.route("/upload").get(getUpload).post(postUpload);
 //하나의 http에 2개 이상의 메소드를 사용할 경우 route 사용
 
