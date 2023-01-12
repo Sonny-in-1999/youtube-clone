@@ -1,4 +1,6 @@
 import userModel from "../models/user";
+import bycrypt from "bcrypt";
+
 
 export const getJoin = (req, res) =>
 res.render("join", {pageTitle:"Join"});
@@ -40,18 +42,29 @@ export const postJoin = async (req, res) => {
 export const getLogin = (req, res) => res.render("login", {pageTitle: "Login"});
 export const postLogin = async (req, res) => {
     const {username, password} = req.body;
-    const exists = await userModel.exists({username, password});
-    if(!exists){
+    const pageTitle = "Login";
+    const user = await userModel.findOne({username});
+    if(!user){
         return res.status(400).render("login", 
         {
-            pageTitle:"Login", 
+            pageTitle, 
             errorMessage:"An account with this username does not exists."
         });
 
     };
     //check if account exists
     //check if password correct
-    res.end();
+    const ok = await bycrypt.compare(password, user.password);
+    if(!ok){
+        return res.status(400).render("login", 
+        {
+            pageTitle, 
+            errorMessage:"Wrong Password."
+        });
+
+    };
+    console.log("LOG USER IN! COMING SOON!")
+    return res.redirect("/");
 };
 export const edit = (req, res) => res.send("Edit User");
 export const remove = (req, res) => res.send("Remove User");
