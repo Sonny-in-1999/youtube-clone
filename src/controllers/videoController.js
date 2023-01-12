@@ -36,7 +36,7 @@ export const getEdit = async (req, res) => {
     const { id } = req.params; //영상의 링크마다 존재하는 난수(id)를 id로 지정. id를 통해 영상을 구분!!
     const video = await videoModel.findById(id);
     if(!video){
-        return res.render("404", {pageTitle: "Video not found."});
+        return res.status(404).render("404", {pageTitle: "Video not found."});
         //존재하지 않는 영상(존재하지 않는 id)을 검색한 경우
     };
     res.render("edit", {pageTitle:`Edit ${video.title}`, video});
@@ -48,7 +48,7 @@ export const postEdit = async (req, res) => {
     const video = await videoModel.exists({ _id: id });
     //exists() => ()안의 내용이 존재하는지 찾을 수 있음
     if(!video){
-        return res.render("404", {pageTitle: "Video not found."});
+        return res.status(404).render("404", {pageTitle: "Video not found."});
         //존재하지 않는 영상(존재하지 않는 id)을 검색한 경우
     };
     await videoModel.findByIdAndUpdate(id, {
@@ -76,7 +76,8 @@ export const postUpload = async (req, res) => {
         //video.save() => 생성된 video를 return 해줌 (db에 저장!)
         return res.redirect("/");
     } catch (error) {
-        return res.render("upload", {
+        return res.status(400).render("upload", {
+            //.status(400): 브라우저에게 상태코드 400를 인식시켜 영상을 저장하지 못하게 함
             pageTitle: "Upload Video",
             errorMessage: error._message,
         });
