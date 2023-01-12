@@ -2,7 +2,7 @@
 
 import express from "express";
 import morgan from "morgan";
-import globalRouter from "./routers/globalRouter";
+import rootRouter from "./routers/rootRouter";
 import userRouter from "./routers/userRouter";
 import videoRouter from "./routers/videoRouter";
 
@@ -20,7 +20,7 @@ app.use(logger);
 app.use(express.urlencoded({extended:true}));
 //form의 value를 리턴해주는 middleware ==> form을 javascript로 변환해줌
 //이 구간에서 req.body 생성
-app.use("/", globalRouter);
+app.use("/", rootRouter);
 app.use("/users", userRouter);
 app.use("/videos", videoRouter);
 
