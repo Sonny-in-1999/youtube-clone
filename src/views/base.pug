@@ -3,7 +3,7 @@
 doctype html
 html(lang="ko")
     head
-        title #{pageTitle} | Metube
+        title #{pageTitle} | #{siteName}
         link(rel="stylesheet" href="https://unpkg.com/mvp.css@1.12/mvp.css") 
     body
         header
@@ -12,7 +12,12 @@ html(lang="ko")
                 ul
                     li
                         a(href="/") Home
-                    if !req.session.loggedIn 
+                    if loggedIn
+                        li 
+                            a(href="/my-profile") #{loggedInUser.name}'s Profile
+                        li
+                            a(href="/logout") Log out
+                    else
                         li
                             a(href="/join") Join
                         li

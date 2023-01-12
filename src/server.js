@@ -2,10 +2,12 @@
 
 import express from "express";
 import morgan from "morgan";
-import session from "express-session";
+import session, { Store } from "express-session";
+import MongoStore from "connect-mongo";
 import rootRouter from "./routers/rootRouter";
 import userRouter from "./routers/userRouter";
 import videoRouter from "./routers/videoRouter";
+import { localsMiddleware } from "./middlewares";
 
 
 
@@ -23,26 +25,24 @@ app.use(express.urlencoded({extended:true}));
 //이 구간에서 req.body 생성
 
 
-app.use(
-    session({
-      secret: "Hello!"
-    })
+app.use( //browser가 백엔드와 상호작용 할때마다 cookie를 전송해주는 middleware
+  session({
+    secret: "Hello!",
+    store: MongoStore.create({mongoUrl:"mongodb://127.0.0.1:27017/metube"}),
+    //session id를 server가 아닌 mongodb에 저장! mongo collections에 sessions가 추가됨!
+    //server가 아닌 db에 저장하므로, 서버를 재시작해도 정보가 사라지지않음!!
+  })
   );
-
-app.use((req, res, next) => {
-    req.sessionStore.all((error, sessions) => {
-        console.log(sessions);
-        //browser마다 다른 cookie(session id)를 보냄. browser 구분 가능.
-        next();
-    });
-});
-
-app.use("/", rootRouter);
-app.use("/users", userRouter);
-app.use("/videos", videoRouter);
-
-export default app;
-
+  
+  
+  
+  app.use(localsMiddleware); //session middleware를 실행한 다음에 실행되어야 함(session object에 접근하기 위함)
+  app.use("/", rootRouter);
+  app.use("/users", userRouter);
+  app.use("/videos", videoRouter);
+  
+  export default app;
+  
 
 
 

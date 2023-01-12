@@ -14,6 +14,7 @@ export const postJoin = async (req, res) => {
             pageTitle,
             errorMessage:"Password confirmation doesn't match."});
     };
+
     const exists = await userModel.exists({$or: [{username}, {email}]});
     //exists($or:~~) : 둘 중 하나라도(or) 존재하는경우
     if(exists){
@@ -39,6 +40,7 @@ export const postJoin = async (req, res) => {
     }
     
 };
+
 export const getLogin = (req, res) => res.render("login", {pageTitle: "Login"});
 export const postLogin = async (req, res) => {
     const {username, password} = req.body;
@@ -67,6 +69,8 @@ export const postLogin = async (req, res) => {
     req.session.user = user;
     return res.redirect("/");
 };
+
+
 export const edit = (req, res) => res.send("Edit User");
 export const remove = (req, res) => res.send("Remove User");
 export const logout = (req,res) => res.send("Log out");
