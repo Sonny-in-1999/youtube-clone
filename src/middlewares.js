@@ -5,7 +5,7 @@ export const localsMiddleware = (req, res, next) => {
     //userModel형식으로 저장된 user의 정보를 res(도착점)에 loggedInUser 객체로 저장!
     console.log(res.locals);
     next();
-}
+};
 
 //res.locals ==> 어떤 객체(object)든 집어넣을 수 있음. 
 //전역함수 => 전역에서 사용 가능 !! pug에서도 사용이 가능하다!
