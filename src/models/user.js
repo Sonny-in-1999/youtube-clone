@@ -4,8 +4,10 @@ import bcrypt from "bcrypt";
 const userSchema = new mongoose.Schema({ //user(model)의 형식(schema)지정
     //use validation => 데이터의 형식을 사전에 지정(문서화!)
     email: {type:String, required:true, unique:true},
+    avatarUrl: String,
+    socialOnly: {type:Boolean, default:false},
     username: {type:String, required:true, unique:true},
-    password: {type:String, required:true},
+    password: {type:String, required:false},
     name: {type:String, required:true},
     location: String
 });
