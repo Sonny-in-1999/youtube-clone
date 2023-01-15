@@ -1,3 +1,4 @@
+import userModel from "../models/user";
 import User from "../models/user"
 import videoModel from "../models/video"
 
@@ -34,15 +35,20 @@ export const watch = async (req, res) => {
 
 export const getEdit = async (req, res) => {
     const { id } = req.params; //영상의 링크마다 존재하는 난수(id)를 id로 지정. id를 통해 영상을 구분!!
+    const {user: {_id}} = req.session;
     const video = await videoModel.findById(id) 
     if(!video){
         return res.status(404).render("404", {pageTitle: "Video not found."});
         //존재하지 않는 영상(존재하지 않는 id)을 검색한 경우
     };
+    if(String(video.owner) !== String(_id)){
+        return res.status(403).redirect("/");
+    };
     res.render("edit", {pageTitle:`Edit ${video.title}`, video});
 };
 
 export const postEdit = async (req, res) => {
+    const {user: {_id}} = req.session;
     const { id } = req.params; //영상의 링크마다 존재하는 난수(id)를 id로 지정. id를 통해 영상을 구분!!
     const {title, description, hashtags} = req.body; //form의 내용을 받아옴!
     const video = await videoModel.exists({ _id: id });
@@ -50,6 +56,9 @@ export const postEdit = async (req, res) => {
     if(!video){
         return res.status(404).render("404", {pageTitle: "Video not found."});
         //존재하지 않는 영상(존재하지 않는 id)을 검색한 경우
+    };
+    if(String(video.owner) !== String(_id)){
+        return res.status(403).redirect("/");
     };
     await videoModel.findByIdAndUpdate(id, {
         title, 
@@ -71,15 +80,16 @@ export const postUpload = async (req, res) => {
     const { title, description, hashtags } = req.body; //form의 내용을 받아옴!
     //name="title"인 input(upload.pug의 text)에서 req.body(input의 내용)을 받아옴!
     try {
-        await videoModel.create({
+        const newVideo = await videoModel.create({
             title,
             description,
             fileUrl,
             owner:_id,
             hashtags: videoModel.formatHashtags(hashtags),
         });
-        //await video.save();
-        //video.save() => 생성된 video를 return 해줌 (db에 저장!)
+        const user = await userModel.findById(_id);
+        user.videos.push(newVideo._id);
+        user.save();
         return res.redirect("/");
     } catch (error) {
         return res.status(400).render("upload", {
@@ -92,10 +102,22 @@ export const postUpload = async (req, res) => {
 };
 
 export const deleteVideo = async (req, res) => {
+    const {user: {_id}} = req.session;
     const {id} = req.params; //영상의 링크마다 존재하는 난수(id)를 id로 지정. id를 통해 영상을 구분!!
+    const video = await videoModel.findById(id);
+    const user = await userModel.findById(_id);
+    if(!video){
+        return res.status(404).render("404", {pageTitle: "Video not found."});
+        //존재하지 않는 영상(존재하지 않는 id)을 검색한 경우
+    };
+    if(String(video.owner) !== String(_id)){
+        return res.status(403).redirect("/");
+    };
     await videoModel.findByIdAndDelete(id);
     //delete video
     //몽고DB는 롤백기능을 지원하지 않으므로 대부분의 상황에서 Remove가 아닌 Delete를 사용!
+    user.videos.splice(user.videos.indexOf(id),1);
+    user.save(); //유저db에 남아있는 videos도 함께 삭제
     return res.redirect("/");
 };
 
