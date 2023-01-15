@@ -5,7 +5,11 @@ block content
     div
         p=video.description
         small=video.createdAt
-    a(href=`${video.id}/edit`) Edit Video &rarr;
-    br
-    a(href=`${video.id}/delete`) Delete Video &rarr;
-    // /~~: 경로에 상관없이 root주소/~~로 이동함
+        div
+            small Uploaded by 
+            a(href=`/users/${video.owner._id}`)=video.owner.name
+        if video.owner._id == loggedInUser._id
+            a(href=`${video.id}/edit`) Edit Video &rarr;
+            br
+            a(href=`${video.id}/delete`) Delete Video &rarr;
+            // /~~: 경로에 상관없이 root주소/~~로 이동함

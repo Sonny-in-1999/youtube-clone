@@ -1,4 +1,4 @@
-
+import User from "../models/user"
 import videoModel from "../models/video"
 
 videoModel.find({}, (error, videos) => {});
@@ -11,12 +11,11 @@ export const home = async(req, res) => {
         //sort: ~~를 기준으로 영상을 분류
         //videoModel.find({}) => db에 있는 video를 불러옴
         //await: callback이 필요하지 않음을 의미(표시)! await이 db를 기다려줌 (중요)await은 async function 안에서만 사용가능!!
-        console.log(videos);
+       
         res.render("home", {pageTitle: "Home", videos});
         //template를 rendering
         //return이 아닌 function(render) 그 자체에 집중할 것!
     } catch(error){ //try에서 에러가 발생할 경우 catch로 점프!
-        console.log(error);
         return res.render("upload", { pageTitle: "Upload Video", errorMessage: error._message })
         //error가 발생할 경우 upload페이지를 다시 렌더링!
     }
@@ -24,17 +23,18 @@ export const home = async(req, res) => {
 
 export const watch = async (req, res) => {
     const { id } = req.params; //영상의 링크마다 존재하는 난수(id)를 id로 지정. id를 통해 영상을 구분!!
-    const video = await videoModel.findById(id);
+    const video = await videoModel.findById(id).populate("owner");; //populate를 통해 다른 컬렉션의 문서를 참조할 수 있음.
+    //populate: 문서의 지정된 경로를 다른 컬렉션의 문서로 자동 교체하는 프로세스
     if(!video){
         return res.render("404", {pageTitle: "Video not found."});
         //존재하지 않는 영상(존재하지 않는 id)을 검색한 경우
     };
-    res.render("watch", {pageTitle: video.title, video });
+    res.render("watch", {pageTitle: video.title, video});
 };
 
 export const getEdit = async (req, res) => {
     const { id } = req.params; //영상의 링크마다 존재하는 난수(id)를 id로 지정. id를 통해 영상을 구분!!
-    const video = await videoModel.findById(id);
+    const video = await videoModel.findById(id) 
     if(!video){
         return res.status(404).render("404", {pageTitle: "Video not found."});
         //존재하지 않는 영상(존재하지 않는 id)을 검색한 경우
@@ -64,6 +64,9 @@ export const getUpload = (req, res) => {
 };
 
 export const postUpload = async (req, res) => {
+    const {
+        user:{_id},
+    } = req.session;
     const {path:fileUrl} = req.file;
     const { title, description, hashtags } = req.body; //form의 내용을 받아옴!
     //name="title"인 input(upload.pug의 text)에서 req.body(input의 내용)을 받아옴!
@@ -72,6 +75,7 @@ export const postUpload = async (req, res) => {
             title,
             description,
             fileUrl,
+            owner:_id,
             hashtags: videoModel.formatHashtags(hashtags),
         });
         //await video.save();
@@ -105,6 +109,5 @@ export const search = async (req, res) => {
             },
         });
     }
-    console.log(videos);
     return res.render("search", {pageTitle:"Search", videos});
 }

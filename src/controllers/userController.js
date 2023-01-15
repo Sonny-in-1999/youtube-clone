@@ -1,4 +1,5 @@
 import userModel from "../models/user";
+import videoModel from "../models/video";
 import bycrypt from "bcrypt";
 import fetch from "node-fetch";
 import { application } from "express";
@@ -110,7 +111,6 @@ export const finishGithubLogin = async (req, res) => {
             }, //access token 값을 이용하여 URL에 github api(유저정보)를 요청(fetch)
         })
         ).json(); //fetch(유저정보를 요청)한 뒤 fetch가 돌아오면 해당 fetch(유저정보)의 JSON을 추출
-        console.log(userData);
         const emailData = await (await fetch(`${apiUrl}/user/emails`, {
                 headers: {
                     Authorization: `token ${access_token}`
@@ -203,7 +203,7 @@ export const getChangePassword = (req, res) => {
     if(req.session.user.socialOnly){ //깃허브로 로그인한 경우 변경 불가
         return res.redirect("/")
     }
-    return res.render("user/change-password", {pageTitle:"Change Password"});
+    return res.render("users/change-password", {pageTitle:"Change Password"});
 }
 
 export const postChangePassword = async (req, res) => {
@@ -215,13 +215,13 @@ export const postChangePassword = async (req, res) => {
         } = req;
         const ok = await bycrypt.compare(oldPassword, password);
         if(!ok){
-            return res.status(HTTP_BAD_REQUEST).render("user/change-password", {
+            return res.status(HTTP_BAD_REQUEST).render("users/change-password", {
                 pageTitle:"Change Password", 
                 errorMessage:"The Old Password is incorrect"
             });
         }
         if(newPassword != newPassword1){
-            return res.status(HTTP_BAD_REQUEST).render("user/change-password", {
+            return res.status(HTTP_BAD_REQUEST).render("users/change-password", {
                 pageTitle:"Change Password", 
                 errorMessage:"The Password does not match with Confirmation"
             });
@@ -232,4 +232,16 @@ export const postChangePassword = async (req, res) => {
     req.session.user.password = user.password; //session에 해싱처리된 새로운 패스워드를 저장
     return res.redirect("/users/logout")
 }
-export const see = (req, res) => res.send("See User");
+export const see = async (req, res) => {
+    const {id} = req.params;
+    const user = await userModel.findById(id);
+    if(!user){
+        return res.status(404).render("404", {pageTitle:"User Not Found."});
+    }
+    const videos = await videoModel.find({owner:user._id});
+    return res.render("users/profile", {
+        pageTitle:`${user.name}'s Profile`, 
+        user,
+        videos,
+    });
+};

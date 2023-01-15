@@ -3,10 +3,10 @@ import mongoose from "mongoose";
 
 const videoSchema = new mongoose.Schema({ //video(model)의 형식(schema)지정
     //use validation => 데이터의 형식을 사전에 지정(문서화!)
-    title: { type: String, required: true, maxLength: 80 },
-    fileUrl: { type: String, required: true },
-    description: { type: String, required: true, minLength: 20 },
-    createdAt: { type:Date, required: true, default: Date.now },
+    title: {type: String, required: true, maxLength: 80},
+    fileUrl: {type: String, required: true},
+    description: {type: String, required: true, minLength: 20},
+    createdAt: {type:Date, required: true, default: Date.now},
     //Date.now() X Date.now O => 내가 새로운 video를 생성했을 때만 실행시키기위해
     //()를 붙일경우 function을 즉각 실행시킴
     hashtags: [{type:String, trim:true}],
@@ -16,6 +16,8 @@ const videoSchema = new mongoose.Schema({ //video(model)의 형식(schema)지정
         views: {type:Number, default: 0, required: true},
         rating: {type:Number, default: 0, required: true},
     },
+    owner: {type:mongoose.Schema.Types.ObjectId, required:true, ref:"User"},
+    //user.js에서 usermodel의 mongoose.model을 선언했을때와 동일한 이름으로 ref 설정 ==> "User"
 });
 videoSchema.static('formatHashtags', function(hashtags){
     return hashtags.split(",").map((word) => word.startsWith('#') ? word : `#${word}`);
