@@ -64,12 +64,14 @@ export const getUpload = (req, res) => {
 };
 
 export const postUpload = async (req, res) => {
+    const {path:fileUrl} = req.file;
     const { title, description, hashtags } = req.body; //form의 내용을 받아옴!
     //name="title"인 input(upload.pug의 text)에서 req.body(input의 내용)을 받아옴!
     try {
         await videoModel.create({
             title,
             description,
+            fileUrl,
             hashtags: videoModel.formatHashtags(hashtags),
         });
         //await video.save();

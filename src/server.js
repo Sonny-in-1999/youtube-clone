@@ -6,7 +6,7 @@ import MongoStore from "connect-mongo";
 import rootRouter from "./routers/rootRouter";
 import userRouter from "./routers/userRouter";
 import videoRouter from "./routers/videoRouter";
-import { localsMiddleware } from "./middlewares";
+import { localsMiddleware, notFoundMiddleware } from "./middlewares";
 
 
 
@@ -48,9 +48,11 @@ app.use( //browser가 백엔드와 상호작용 할때마다 cookie를 전송해
   
   
   app.use(localsMiddleware); //session middleware를 실행한 다음에 실행되어야 함(session object에 접근하기 위함)
+  app.use("/upload", express.static("upload"))
   app.use("/", rootRouter);
   app.use("/users", userRouter);
   app.use("/videos", videoRouter);
+  app.use(notFoundMiddleware);
   
   export default app;
   

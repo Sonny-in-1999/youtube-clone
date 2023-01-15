@@ -17,7 +17,8 @@ userSchema.pre('save', async function(){ //Middelware; pre hook user password
     //입력된 유저의 password를 해싱처리하여 save하는 middleware!
     this.password = await bcrypt.hash(this.password, 5);
     //saltRounds = 5 => 비밀번호 해싱을 총 5회 진행!
-})
+});
+
 const userModel = mongoose.model("User", userSchema);
 
 export default userModel;

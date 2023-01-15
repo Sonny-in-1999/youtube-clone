@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 const videoSchema = new mongoose.Schema({ //video(model)의 형식(schema)지정
     //use validation => 데이터의 형식을 사전에 지정(문서화!)
     title: { type: String, required: true, maxLength: 80 },
+    fileUrl: { type: String, required: true },
     description: { type: String, required: true, minLength: 20 },
     createdAt: { type:Date, required: true, default: Date.now },
     //Date.now() X Date.now O => 내가 새로운 video를 생성했을 때만 실행시키기위해
