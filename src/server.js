@@ -6,6 +6,7 @@ import MongoStore from "connect-mongo";
 import rootRouter from "./routers/rootRouter";
 import userRouter from "./routers/userRouter";
 import videoRouter from "./routers/videoRouter";
+import apiRouter from "./routers/apiRouter";
 import { localsMiddleware, notFoundMiddleware } from "./middlewares";
 
 
@@ -55,8 +56,8 @@ app.use( //browser가 백엔드와 상호작용 할때마다 cookie를 전송해
   app.use("/", rootRouter);
   app.use("/users", userRouter);
   app.use("/videos", videoRouter);
-  app.use(notFoundMiddleware);
-  
+  app.use("/api", apiRouter);
+
   export default app;
   
 
