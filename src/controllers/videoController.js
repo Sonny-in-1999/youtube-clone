@@ -8,7 +8,9 @@ videoModel.find({}, (error, videos) => {});
 
 export const home = async(req, res) => { 
     try { //실행
-        const videos = await videoModel.find({}).sort({createdAt:"desc"});
+        const videos = await videoModel.find({})
+        .sort({ createdAt: "desc" })
+        .populate("owner");
         //sort: ~~를 기준으로 영상을 분류
         //videoModel.find({}) => db에 있는 video를 불러옴
         //await: callback이 필요하지 않음을 의미(표시)! await이 db를 기다려줌 (중요)await은 async function 안에서만 사용가능!!
@@ -129,7 +131,7 @@ export const search = async (req, res) => {
             title: { //$regex : keyword를 포함(contains)하여 검색!
                 $regex: new RegExp(keyword, "i") //"i": 대/소문자 구분없이 검색
             },
-        });
+        }).populate("owner");
     }
     return res.render("search", {pageTitle:"Search", videos});
 }

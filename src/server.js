@@ -49,8 +49,9 @@ app.use( //browser가 백엔드와 상호작용 할때마다 cookie를 전송해
   
   app.use(localsMiddleware); //session middleware를 실행한 다음에 실행되어야 함(session object에 접근하기 위함)
   app.use("/upload", express.static("upload"));
-  //.static ==> 이용자들이 열람할 수 있는 경로를 지정!
+  //.static ==> 이용자들이 열람할 수 있는 경로를 지정
   app.use("/static", express.static("assets"));
+  // /static을 assets폴더에 접근할 수 있는 정적 경로로 지정
   app.use("/", rootRouter);
   app.use("/users", userRouter);
   app.use("/videos", videoRouter);
