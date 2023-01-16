@@ -7,7 +7,7 @@
     "url": "git+https://github.com/Sonny-in-1999/youtube-clone.git"
   },
   "scripts": {
-    "dev": "nodemon --exec babel-node src/init.js",
+    "dev": "nodemon",
     "assets": "webpack --config webpack.config.js"
   },
   "author": "Minsu Son<minsoo1022@gmail.com>",
