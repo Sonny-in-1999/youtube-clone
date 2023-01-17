@@ -2,6 +2,7 @@
 import express from "express";
 import morgan from "morgan";
 import session, { Store } from "express-session";
+import flash from "express-flash";
 import MongoStore from "connect-mongo";
 import rootRouter from "./routers/rootRouter";
 import userRouter from "./routers/userRouter";
@@ -47,7 +48,7 @@ app.use( //browser가 백엔드와 상호작용 할때마다 cookie를 전송해
   );
   
   
-  
+  app.use(flash());
   app.use(localsMiddleware); //session middleware를 실행한 다음에 실행되어야 함(session object에 접근하기 위함)
   app.use("/upload", express.static("upload"));
   //.static ==> 이용자들이 열람할 수 있는 경로를 지정

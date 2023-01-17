@@ -44,6 +44,7 @@ export const getEdit = async (req, res) => {
         //존재하지 않는 영상(존재하지 않는 id)을 검색한 경우
     };
     if(String(video.owner) !== String(_id)){
+        req.flash("error", "Not authorized");
         return res.status(403).redirect("/");
     };
     res.render("edit", {pageTitle:`Edit ${video.title}`, video});
@@ -60,13 +61,15 @@ export const postEdit = async (req, res) => {
         //존재하지 않는 영상(존재하지 않는 id)을 검색한 경우
     };
     if(String(video.owner) !== String(_id)){
+        req.flash("error", "You are not the owner of the video");
         return res.status(403).redirect("/");
     };
     await videoModel.findByIdAndUpdate(id, {
         title, 
         description, 
         hashtags: videoModel.formatHashtags(hashtags),
-    })
+    });
+    req.flash("success", "Changes saved");
     return res.redirect(`/videos/${id}`);
 };
 
@@ -78,14 +81,16 @@ export const postUpload = async (req, res) => {
     const {
         user:{_id},
     } = req.session;
-    const {path:fileUrl} = req.file;
+    const { video, thumb } = req.files;
+    console.log(video, thumb);
     const { title, description, hashtags } = req.body; //form의 내용을 받아옴!
     //name="title"인 input(upload.pug의 text)에서 req.body(input의 내용)을 받아옴!
     try {
         const newVideo = await videoModel.create({
             title,
             description,
-            fileUrl,
+            fileUrl: video[0].path,
+            thumbUrl: thumb[0].path,
             owner:_id,
             hashtags: videoModel.formatHashtags(hashtags),
         });
