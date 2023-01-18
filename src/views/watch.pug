@@ -23,7 +23,6 @@ block content
         p.video__title=video.title
         small.video__owner Uploaded by 
             a(href=`/users/${video.owner._id}`)=video.owner.name
-        br
         small.video__createdAt=new Date(video.createdAt).toLocaleDateString("ko-kr", {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})
         br
         if String(video.owner._id) === String(loggedInUser._id)
@@ -31,11 +30,16 @@ block content
             br
             a(href=`${video.id}/delete`) Delete Video &rarr;
     if loggedIn
-        div.video__comments
+        div.video__add-comments
             form.video__comments-form#commentForm
                 textarea(cols="30", rows="10" placeholder="Write a comment....")
                 button Add Comment
-
+    div.video__comments
+        ul
+            each comment in video.comments.reverse()
+                li.video__comment
+                    i.fas.fa-comment
+                    span  #{comment.text}
 
 block scripts 
     script(src="/static/js/videoplayer.js")

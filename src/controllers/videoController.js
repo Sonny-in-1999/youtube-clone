@@ -1,6 +1,7 @@
 import userModel from "../models/user";
-import User from "../models/user"
-import videoModel from "../models/video"
+import videoModel from "../models/video";
+import commentModel from "../models/comment.";
+import User from "../models/user";
 
 videoModel.find({}, (error, videos) => {});
 //{}: Search Term(비어있을 경우, 모든 형식을 search), db가 반응할경우 mongoose가 function 실행!
@@ -26,8 +27,9 @@ export const home = async(req, res) => {
 
 export const watch = async (req, res) => {
     const { id } = req.params; //영상의 링크마다 존재하는 난수(id)를 id로 지정. id를 통해 영상을 구분!!
-    const video = await videoModel.findById(id).populate("owner");; //populate를 통해 다른 컬렉션의 문서를 참조할 수 있음.
+    const video = await videoModel.findById(id).populate("owner").populate("comments"); //populate를 통해 다른 컬렉션의 문서를 참조할 수 있음.
     //populate: 문서의 지정된 경로를 다른 컬렉션의 문서로 자동 교체하는 프로세스
+    console.log(video);
     if(!video){
         return res.render("404", {pageTitle: "Video not found."});
         //존재하지 않는 영상(존재하지 않는 id)을 검색한 경우
@@ -154,9 +156,24 @@ export const registerView = async (req, res) => {
     return res.sendStatus(200);
 };
 
-export const createComment = (req, res) => {
-    console.log(req.params);
-    console.log(req.body);
-    console.log(req.body.text, req.body.rating);
-    return res.end();
+export const createComment = async (req, res) => {
+    const {
+        session: {user},
+        body: {text},
+        params: {id},
+    } = req;
+    
+    const video = await videoModel.findById(id);
+    if(!video){
+        return res.sendStatus(404);
+    }
+    const comment = await commentModel.create({
+        text,
+        owner:user._id,
+        video:id,
+    });
+    video.comments.push(comment._id);
+    video.save();
+    return res.sendStatus(201);
+    //201 = Created(새로운 리소스를 생성함)
 };
