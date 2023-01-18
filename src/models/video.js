@@ -17,6 +17,7 @@ const videoSchema = new mongoose.Schema({ //video(model)의 형식(schema)지정
         views: {type:Number, default: 0, required: true},
         rating: {type:Number, default: 0, required: true},
     },
+    comments:[{type:mongoose.Schema.Types.ObjectId, ref: "Comment"}],
     owner: {type:mongoose.Schema.Types.ObjectId, required:true, ref:"User"},
     //user.js에서 usermodel의 mongoose.model을 선언했을때와 동일한 이름으로 ref 설정 ==> "User"
 });

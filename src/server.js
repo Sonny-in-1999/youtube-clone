@@ -24,7 +24,11 @@ app.use(logger);
 app.use(express.urlencoded({extended:true}));
 //form의 value를 리턴해주는 middleware ==> form을 javascript로 변환해줌
 //이 구간에서 req.body 생성
+app.use(express.json());
+//data를 받아서 json형식으로 백엔드에 전송
 
+//app.use(express.text());
+//data를 받아서 string형식으로 백엔드에 전송
 
 app.use( //browser가 백엔드와 상호작용 할때마다 cookie를 전송해주는 middleware
   session({

@@ -4,6 +4,7 @@ import "dotenv/config" //.env에 있는 string을 process.env.~~로 불러올 �
 import "./db";
 import videoModel from "./models/video";
 import userModel from "./models/user";
+import commentModel from "./models/comment.";
 import app from "./server";
 
 const PORT = 4000;

@@ -139,7 +139,7 @@ export const search = async (req, res) => {
         }).populate("owner");
     }
     return res.render("search", {pageTitle:"Search", videos});
-}
+};
 
 
 export const registerView = async (req, res) => {
@@ -152,4 +152,11 @@ export const registerView = async (req, res) => {
     video.meta.views = video.meta.views + 1;
     await video.save();
     return res.sendStatus(200);
-  };
+};
+
+export const createComment = (req, res) => {
+    console.log(req.params);
+    console.log(req.body);
+    console.log(req.body.text, req.body.rating);
+    return res.end();
+};
