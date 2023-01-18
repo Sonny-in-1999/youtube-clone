@@ -29,7 +29,6 @@ export const watch = async (req, res) => {
     const { id } = req.params; //영상의 링크마다 존재하는 난수(id)를 id로 지정. id를 통해 영상을 구분!!
     const video = await videoModel.findById(id).populate("owner").populate("comments"); //populate를 통해 다른 컬렉션의 문서를 참조할 수 있음.
     //populate: 문서의 지정된 경로를 다른 컬렉션의 문서로 자동 교체하는 프로세스
-    console.log(video);
     if(!video){
         return res.render("404", {pageTitle: "Video not found."});
         //존재하지 않는 영상(존재하지 않는 id)을 검색한 경우
@@ -84,7 +83,6 @@ export const postUpload = async (req, res) => {
         user:{_id},
     } = req.session;
     const { video, thumb } = req.files;
-    console.log(video, thumb);
     const { title, description, hashtags } = req.body; //form의 내용을 받아옴!
     //name="title"인 input(upload.pug의 text)에서 req.body(input의 내용)을 받아옴!
     try {
@@ -174,6 +172,21 @@ export const createComment = async (req, res) => {
     });
     video.comments.push(comment._id);
     video.save();
-    return res.sendStatus(201);
+    return res.status(201).json({newCommentId:comment._id});
+    //request를 보낼경우 backend에서 comment._id로 응답함
     //201 = Created(새로운 리소스를 생성함)
+};
+
+export const deleteComment = async (req, res) => {
+    const { id, videoid } = req.body; // comment id, video id
+    const { _id } = req.session.user; // user id
+    const { owner } = await commentModel.findById(id);
+    const video = await videoModel.findById(videoid);
+    if (String(owner) !== _id) return res.sendStatus(403);
+    else {
+      await commentModel.findByIdAndDelete(id);
+      video.comments.splice(video.comments.indexOf(videoid), 1);
+      video.save();
+      return res.sendStatus(200);
+    }
 };
