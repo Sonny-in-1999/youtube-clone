@@ -37,11 +37,11 @@ Router(경로설정) <--- Controller(Router의 기능 설정)
 
 
 #Template
-1. Conditinal
+1. Conditinal:
 ex)login/log-out
 if/else/else if
 
-2. iteration
+2. iteration:
 showing lists of element
 each ~~ in ~~
 
